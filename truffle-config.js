@@ -11,6 +11,17 @@ module.exports = {
       port: 9545,
       network_id: "*", //match any network id
     },
+    bsc: {
+      provider: function () {
+        return new HDWalletProvider(
+          privateKeys.split(","), // array of private keys
+          `https://data-seed-prebsc-1-s1.binance.org:8545` // Url to an Ethereum node
+        );
+      },
+      gas: 5000000,
+      gasPrice: 25000000000,
+      network_id: 97,
+    },
     rinkeby: {
       provider: function () {
         return new HDWalletProvider(
