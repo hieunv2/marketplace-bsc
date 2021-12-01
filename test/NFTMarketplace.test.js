@@ -12,7 +12,9 @@ contract('NFTMarketplace', (accounts) => {
     nftContract = await NFTCollection.new();
 
     const NFTaddress = nftContract.address;
-    mktContract = await NFTMarketplace.new(NFTaddress);
+    //1000 mean 10% fee
+    const serviceFee = 1000;
+    mktContract = await NFTMarketplace.new(NFTaddress, serviceFee);
 
     await nftContract.safeMint('testURI');
     await nftContract.safeMint('testURI2');
@@ -64,7 +66,7 @@ contract('NFTMarketplace', (accounts) => {
       const offer = await mktContract.offers(1);
       assert.equal(offer.fulfilled, true);
       const userFunds = await mktContract.userFunds(offer.user);
-      assert.equal(userFunds.toNumber(), 10);
+      assert.equal(userFunds.toNumber(), 9);
 
       const log = result.logs[0];
       assert.equal(log.event, 'OfferFilled');
@@ -89,7 +91,7 @@ contract('NFTMarketplace', (accounts) => {
     });
 
     it('The ETH sent should match the price', async() => {
-      await expectRevert(mktContract.fillOffer(2, { from: accounts[1], value: 5 }), 'The ETH amount should match with the NFT Price');
+      await expectRevert(mktContract.fillOffer(2, { from: accounts[1], value: 5 }), 'The BSC amount should match with the NFT Price');
     });
   });
 
@@ -131,14 +133,14 @@ contract('NFTMarketplace', (accounts) => {
       const fundsBefore = await mktContract.userFunds(accounts[0]);
       const result = await mktContract.claimFunds({ from: accounts[0] });
       const fundsAfter = await mktContract.userFunds(accounts[0]);
-      assert.equal(fundsBefore.toNumber(), 10);
+      assert.equal(fundsBefore.toNumber(), 9);
       assert.equal(fundsAfter.toNumber(), 0);
 
       const log = result.logs[0];
       assert.equal(log.event, 'ClaimFunds');
       const event = log.args;
       assert.equal(event.user, accounts[0]);
-      assert.equal(event.amount.toNumber(), 10);
+      assert.equal(event.amount.toNumber(), 9);
     });
   });
 });
