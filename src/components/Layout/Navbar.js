@@ -81,11 +81,6 @@ const Navbar = () => {
           )}
         </Grid>
         <Grid item xs={12} sm={5}>
-          {marketplaceCtx.userFunds > 0 && !fundsLoading && (
-            <ButtonCustom onClick={claimFundsHandler}>
-              {`CLAIM ${formatPrice(marketplaceCtx.userFunds)} BNB`}
-            </ButtonCustom>
-          )}
           {fundsLoading && (
             <div class="d-flex justify-content-center text-info">
               <div class="spinner-border" role="status">

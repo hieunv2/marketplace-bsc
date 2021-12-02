@@ -179,20 +179,19 @@ export const Header = (props) => {
       {showNavbar && <Navbar />}
       <div className="intro">
         <div className="overlay">
-          <Grid container>
-            <Grid xs={6}>
+          <div container>
+            <div xs={6}>
               <div className="container">
                 <div className="row">
                   <div className="col-md-8 col-md-offset-2 intro-text">
-                    <h1>
-                      All NFTs You need in One Marketplace
-                      <span></span>
-                    </h1>
+                    <p style={{ color: "white", fontSize: 50 }}>
+                      Demo Basic Marketplace
+                    </p>
                   </div>
                 </div>
               </div>
-            </Grid>
-            <Grid xs={6}>
+            </div>
+            <div xs={6}>
               <div className="container">
                 <div className="row">
                   <div className="col-md-8 col-md-offset-2 intro-text">
@@ -201,8 +200,8 @@ export const Header = (props) => {
                   </div>
                 </div>
               </div>
-            </Grid>
-          </Grid>
+            </div>
+          </div>
           <div className="container">
             <Grid>
               <p className="title">Recently Listed</p>

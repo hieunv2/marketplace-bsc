@@ -88,73 +88,65 @@ const NFTCollection = () => {
             ? formatPrice(marketplaceCtx.offers[index].price).toFixed(2)
             : null;
 
-        return (
-          owner === web3Ctx.account && (
-            <div
-              key={key}
-              className="col-md-2 m-3 pb-3 card-nft border-info portfolio-item"
-            >
-              <div className="hover-bg">
-                <div className={"card-body"}>
-                  <p style={{ color: "white", fontSize: 20 }}>{NFT.title}</p>
-                </div>
-                <img
-                  src={`https://ipfs.infura.io/ipfs/${NFT.img}`}
-                  className="card-img-bottom"
-                  alt={`NFT ${key}`}
-                />
-                <p className="fw-light fs-6">{`${owner.substr(
-                  0,
-                  7
-                )}...${owner.substr(owner.length - 7)}`}</p>
+        return owner === web3Ctx.account ? (
+          <div
+            key={key}
+            className="col-md-2 m-3 pb-3 card-nft border-info portfolio-item"
+          >
+            <div className="hover-bg">
+              <div className={"card-body"}>
+                <p style={{ color: "white", fontSize: 20 }}>{NFT.title}</p>
+              </div>
+              <img
+                src={`https://ipfs.infura.io/ipfs/${NFT.img}`}
+                className="card-img-bottom"
+                alt={`NFT ${key}`}
+              />
+              <p className="fw-light fs-6">{`${owner.substr(
+                0,
+                7
+              )}...${owner.substr(owner.length - 7)}`}</p>
 
-                {index !== -1 ? (
-                  <div className="row">
-                    <div className="d-grid gap-2 col-5 mx-auto">
-                      <button
-                        onClick={cancelHandler}
-                        value={index}
-                        className="btn btn-danger"
-                      >
-                        CANCEL
-                      </button>
-                    </div>
-                    <div className="col-7 d-flex justify-content-end">
-                      <img
-                        src={eth}
-                        width="25"
-                        height="25"
-                        className="align-center float-start"
-                        alt="price icon"
-                      ></img>
-                      <p className="text-start">
-                        <b>{`${price}`}</b>
-                      </p>
-                    </div>
+              {index !== -1 ? (
+                <div className="row">
+                  <div className="d-grid gap-2 col-5 mx-auto">
+                    <button
+                      onClick={cancelHandler}
+                      value={index}
+                      className="btn btn-danger"
+                    >
+                      CANCEL
+                    </button>
                   </div>
-                ) : (
-                  <form
-                    className="row g-2"
-                    onSubmit={(e) => makeOfferHandler(e, NFT.id, key)}
-                  >
-                    <div className="col-5 d-grid gap-2">
-                      <button type="submit" className="btn btn-secondary">
-                        SELL
-                      </button>
-                    </div>
-                    <div className="col-7">
-                      <input
-                        type="number"
-                        step="0.01"
-                        placeholder="BND..."
-                        className="form-control"
-                        ref={priceRefs.current[key]}
-                      />
-                    </div>
-                  </form>
-                )}
+                  <div className="col-7 d-flex justify-content-end">
+                    <p className="text-start">
+                      <b>{`${price} BNB`}</b>
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <form
+                  className="row g-2"
+                  onSubmit={(e) => makeOfferHandler(e, NFT.id, key)}
+                >
+                  <div className="col-5 d-grid gap-2">
+                    <button type="submit" className="btn btn-secondary">
+                      SELL
+                    </button>
+                  </div>
+                  <div className="col-7">
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="BNB..."
+                      className="form-control"
+                      ref={priceRefs.current[key]}
+                    />
+                  </div>
+                </form>
+              )}
 
-                {/* {index !== -1 ? (
+              {/* {index !== -1 ? (
                 owner === web3Ctx.account && (
                   <div className="row">
                     <div className="d-grid gap-2 col-5 mx-auto">
@@ -205,10 +197,9 @@ const NFTCollection = () => {
                   <br />
                 </p>
               )} */}
-              </div>
             </div>
-          )
-        );
+          </div>
+        ) : null;
       })}
     </div>
   );

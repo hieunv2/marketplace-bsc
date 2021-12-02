@@ -4,6 +4,8 @@ import Web3Context from "../../../store/web3-context";
 import CollectionContext from "../../../store/collection-context";
 import TextField from "@mui/material/TextField";
 import { Form } from "react-bootstrap";
+import ImageUploading from "react-images-uploading";
+import ImageUpload from "./image-upload.png";
 
 import styled from "styled-components";
 
@@ -27,6 +29,24 @@ const MintForm = () => {
   const web3Ctx = useContext(Web3Context);
   const collectionCtx = useContext(CollectionContext);
 
+  const [images, setImages] = useState([]);
+
+  const onChange = (imageList, addUpdateIndex) => {
+    // data for submit
+    console.log(imageList, addUpdateIndex);
+    setImages(imageList);
+
+    if (imageList.length > 0) {
+      const reader = new window.FileReader();
+      // reader.readAsDataURL(imageList[0]);
+      // console.log(imageList[0]);
+      reader.readAsArrayBuffer(imageList[0].file);
+      reader.onloadend = () => {
+        setCapturedFileBuffer(Buffer(reader.result));
+      };
+    }
+  };
+
   const enteredNameHandler = (event) => {
     setEnteredName(event.target.value);
   };
@@ -35,13 +55,9 @@ const MintForm = () => {
     setEnteredDescription(event.target.value);
   };
 
-  const captureFile = (event) => {
-    event.preventDefault();
-
-    const file = event.target.files[0];
-
+  const handleMint = () => {
     const reader = new window.FileReader();
-    reader.readAsArrayBuffer(file);
+    reader.readAsArrayBuffer(images[0]);
     reader.onloadend = () => {
       setCapturedFileBuffer(Buffer(reader.result));
     };
@@ -140,17 +156,58 @@ const MintForm = () => {
           />
         </Form.Group>
 
-        <div className="col-md-2">
+        <ImageUploading
+          multiple
+          value={images}
+          onChange={onChange}
+          maxNumber={1}
+          dataURLKey="data_url"
+        >
+          {({
+            imageList,
+            onImageUpload,
+            onImageRemoveAll,
+            onImageUpdate,
+            onImageRemove,
+            isDragging,
+            dragProps,
+          }) => (
+            // write your building UI
+            <div className="upload__image-wrapper">
+              {images.length === 0 && (
+                <button
+                  style={isDragging ? { color: "red" } : undefined}
+                  onClick={onImageUpload}
+                  {...dragProps}
+                >
+                  <img style={{ width: 30, height: 30 }} src={ImageUpload} />
+                </button>
+              )}
+              &nbsp;
+              {imageList.map((image, index) => (
+                <div key={index} className="image-item">
+                  <img src={image["data_url"]} alt="" width="100" />
+                  <div className="image-item__btn-wrapper">
+                    <button onClick={() => onImageUpdate(index)}>Update</button>
+                    <button onClick={() => onImageRemove(index)}>Remove</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </ImageUploading>
+
+        {/* <div className="col-md-2">
           <input
             type="file"
             className={`${fileClass} mb-1`}
             onChange={captureFile}
           />
-        </div>
+        </div> */}
       </div>
 
       <button type="submit" className="my-button">
-        MINT
+        Create NFT
       </button>
     </form>
   );
