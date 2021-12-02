@@ -1,5 +1,6 @@
 const { expectRevert } = require('@openzeppelin/test-helpers');
 const { assertion } = require('@openzeppelin/test-helpers/src/expectRevert');
+const { web3 } = require('@openzeppelin/test-helpers/src/setup');
 
 const NFTCollection = artifacts.require('./NFTCollection.sol');
 const NFTMarketplace = artifacts.require('./NFTMarketplace.sol');
@@ -62,16 +63,18 @@ contract('NFTMarketplace', (accounts) => {
 
   describe('Fill Offer', () => {
     it('fills the offer and emits Event', async() => {
+      const balanceBefore = await web3.eth.getBalance(accounts[0]);
+      console.log(balanceBefore.toString());
       const result = await mktContract.fillOffer(1, { from: accounts[1], value: 10 });
       const offer = await mktContract.offers(1);
       assert.equal(offer.fulfilled, true);
-      const userFunds = await mktContract.userFunds(offer.user);
-      assert.equal(userFunds.toNumber(), 9);
-
+      const balanceAfter = await web3.eth.getBalance(accounts[0]);
+      console.log(balanceAfter.toString());
       const log = result.logs[0];
       assert.equal(log.event, 'OfferFilled');
       const event = log.args;
       assert.equal(event.offerId.toNumber(), 1);
+    
     });
     
     it('The offer must exist', async() => {
@@ -124,23 +127,4 @@ contract('NFTMarketplace', (accounts) => {
     });
   });
 
-  describe('Claim funds', () => {
-    it('Rejects users without funds to claim', async() => {
-      await expectRevert(mktContract.claimFunds({ from: accounts[1] }), 'This user has no funds to be claimed');
-    });
-
-    it('Pays the correct amount and emits Event', async() => {
-      const fundsBefore = await mktContract.userFunds(accounts[0]);
-      const result = await mktContract.claimFunds({ from: accounts[0] });
-      const fundsAfter = await mktContract.userFunds(accounts[0]);
-      assert.equal(fundsBefore.toNumber(), 9);
-      assert.equal(fundsAfter.toNumber(), 0);
-
-      const log = result.logs[0];
-      assert.equal(log.event, 'ClaimFunds');
-      const event = log.args;
-      assert.equal(event.user, accounts[0]);
-      assert.equal(event.amount.toNumber(), 9);
-    });
-  });
 });

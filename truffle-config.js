@@ -47,4 +47,10 @@ module.exports = {
       version: "^0.8.0",
     },
   },
+  api_keys: {
+    bscscan: 'WNWEKSXY5P1CNB674PDIDDCQKGQJNKQ1Z5',
+  },
+  plugins: [
+    'truffle-plugin-verify'
+  ]
 };
