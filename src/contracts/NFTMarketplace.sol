@@ -70,7 +70,7 @@ contract NFTMarketplace is Ownable {
         _offer.fulfilled = true;
         uint fee = msg.value * serviceFee / 10000;
         uint amount_left = msg.value - fee;
-        payable(msg.sender).transfer(amount_left);
+        payable(_offer.user).transfer(amount_left);
 
         emit OfferFilled(_offerId, _offer.id, msg.sender, amount_left, fee);
     }
