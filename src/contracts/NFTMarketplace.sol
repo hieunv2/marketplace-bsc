@@ -113,4 +113,8 @@ contract NFTMarketplace is Ownable {
     function claim(address _recipitient) public onlyOwner {
       payable(_recipitient).transfer(address(this).balance);
     }
+
+    function setServiceFee(uint _newServiceFee) public onlyOwner {
+        serviceFee = _newServiceFee;
+    }
 }
