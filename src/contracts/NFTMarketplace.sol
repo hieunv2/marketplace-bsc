@@ -7,7 +7,6 @@ contract NFTMarketplace is Ownable {
     uint256 public offerCount;
     uint256 public serviceFee; // BPS = 10000. serviceFee = 1000 that means = 10 % 
     mapping(uint256 => _Offer) public offers;
-    mapping(address => uint256) public userFunds;
 
     NFTCollection nftCollection;
 
@@ -29,7 +28,7 @@ contract NFTMarketplace is Ownable {
         bool cancelled
     );
 
-    event OfferFilled(uint256 offerId, uint256 id, address newOwner);
+    event OfferFilled(uint256 offerId, uint256 id, address newOwner, uint amount, uint256 fee);
     event OfferCancelled(uint256 offerId, uint256 id, address owner);
     event ClaimFunds(address user, uint256 amount);
 
@@ -71,8 +70,9 @@ contract NFTMarketplace is Ownable {
         _offer.fulfilled = true;
         uint fee = msg.value * serviceFee / 10000;
         uint amount_left = msg.value - fee;
-        userFunds[_offer.user] += amount_left;
-        emit OfferFilled(_offerId, _offer.id, msg.sender);
+        payable(msg.sender).transfer(amount_left);
+
+        emit OfferFilled(_offerId, _offer.id, msg.sender, amount_left, fee);
     }
 
     function cancelOffer(uint256 _offerId) public {
@@ -93,16 +93,6 @@ contract NFTMarketplace is Ownable {
         nftCollection.transferFrom(address(this), msg.sender, _offer.id);
         _offer.cancelled = true;
         emit OfferCancelled(_offerId, _offer.id, msg.sender);
-    }
-
-    function claimFunds() public {
-        require(
-            userFunds[msg.sender] > 0,
-            "This user has no funds to be claimed"
-        );
-        payable(msg.sender).transfer(userFunds[msg.sender]);
-        emit ClaimFunds(msg.sender, userFunds[msg.sender]);
-        userFunds[msg.sender] = 0;
     }
 
     // Fallback: reverts if Ether is sent to this smart-contract by mistake
