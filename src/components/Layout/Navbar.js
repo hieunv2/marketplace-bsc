@@ -24,76 +24,41 @@ const Navbar = () => {
     }
 
     // Load accounts
-    web3Ctx.loadAccount(web3);
+    await web3Ctx.loadAccount(web3);
   };
-
-  const claimFundsHandler = () => {
-    marketplaceCtx.contract.methods
-      .claimFunds()
-      .send({ from: web3Ctx.account })
-      .on("transactionHash", (hash) => {
-        setFundsLoading(true);
-      })
-      .on("error", (error) => {
-        window.alert("Something went wrong when pushing to the blockchain");
-        setFundsLoading(false);
-      });
-  };
-
-  // Event ClaimFunds subscription
-  marketplaceCtx.contract.events
-    .ClaimFunds()
-    .on("data", (event) => {
-      marketplaceCtx.loadUserFunds(marketplaceCtx.contract, web3Ctx.account);
-      setFundsLoading(false);
-    })
-    .on("error", (error) => {
-      console.log(error);
-    });
 
   let etherscanUrl = "https://testnet.bscscan.com/";
 
   return (
     <div
       style={{
+        fontSize: 20,
         position: "absolute",
-        top: 50,
+        top: 20,
         right: "10%",
-        width: "50%",
-        zIndex: 100,
       }}
     >
       <Grid container>
-        <Grid item xs={12} sm={7}>
-          {web3Ctx.account && (
-            <div style={{ fontSize: 20 }}>
-              <span>My account: </span>
-              <a
-                href={`${etherscanUrl}/address/${web3Ctx.account}`}
-                target="blank"
-                rel="noopener noreferrer"
-              >
-                {web3Ctx.account.slice(0, 10) +
-                  "..." +
-                  web3Ctx.account.slice(35, 46)}
-              </a>
-            </div>
-          )}
-        </Grid>
-        <Grid item xs={12} sm={5}>
-          {fundsLoading && (
-            <div class="d-flex justify-content-center text-info">
-              <div class="spinner-border" role="status">
-                <span class="sr-only"></span>
-              </div>
-            </div>
-          )}
-          {!web3Ctx.account && (
-            <ButtonCustom onClick={() => connectWalletHandler()}>
-              Connect wallet
-            </ButtonCustom>
-          )}
-        </Grid>
+        {web3Ctx.account ? (
+          <div
+            style={{ padding: 10, backgroundColor: "grey", borderRadius: 20 }}
+          >
+            <span>{(web3Ctx.balance / 10 ** 18).toFixed(2)} BNB: </span>
+            <a
+              href={`${etherscanUrl}/address/${web3Ctx.account}`}
+              target="blank"
+              rel="noopener noreferrer"
+            >
+              {web3Ctx.account.slice(0, 6) +
+                "..." +
+                web3Ctx.account.slice(38, 42)}
+            </a>
+          </div>
+        ) : (
+          <ButtonCustom onClick={() => connectWalletHandler()}>
+            Connect wallet
+          </ButtonCustom>
+        )}
       </Grid>
     </div>
   );

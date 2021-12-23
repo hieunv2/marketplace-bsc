@@ -1,6 +1,8 @@
 import { useReducer } from "react";
 
 import MarketplaceContext from "./marketplace-context";
+import { RENT_ADDRESS } from "../common/config";
+import ABI from "../abis/NFTRenting.json";
 
 const defaultMarketplaceState = {
   contract: null,
@@ -115,10 +117,8 @@ const MarketplaceProvider = (props) => {
     defaultMarketplaceState
   );
 
-  const loadContractHandler = (web3, NFTMarketplace, deployedNetwork) => {
-    const contract = deployedNetwork
-      ? new web3.eth.Contract(NFTMarketplace.abi, deployedNetwork.address)
-      : "";
+  const loadContractHandler = (web3) => {
+    const contract = new web3.eth.Contract(ABI, RENT_ADDRESS);
     dispatchMarketplaceAction({ type: "CONTRACT", contract: contract });
     return contract;
   };

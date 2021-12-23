@@ -1,10 +1,12 @@
-import React from 'react';
+import React from "react";
 
 const Web3Context = React.createContext({
   account: null,
+  balance: 0,
   networkId: null,
   loadAccount: () => {},
-  loadNetworkId: () => {}
+  loadBalance: () => {},
+  loadNetworkId: () => {},
 });
 
 export default Web3Context;

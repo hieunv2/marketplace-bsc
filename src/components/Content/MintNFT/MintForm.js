@@ -9,13 +9,6 @@ import ImageUpload from "./image-upload.png";
 
 import styled from "styled-components";
 
-const ipfsClient = require("ipfs-http-client");
-const ipfs = ipfsClient.create({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-});
-
 const MintForm = () => {
   const [enteredName, setEnteredName] = useState("");
   const [descriptionIsValid, setDescriptionIsValid] = useState(true);
@@ -55,14 +48,6 @@ const MintForm = () => {
     setEnteredDescription(event.target.value);
   };
 
-  const handleMint = () => {
-    const reader = new window.FileReader();
-    reader.readAsArrayBuffer(images[0]);
-    reader.onloadend = () => {
-      setCapturedFileBuffer(Buffer(reader.result));
-    };
-  };
-
   const submissionHandler = (event) => {
     event.preventDefault();
 
@@ -70,46 +55,15 @@ const MintForm = () => {
     enteredDescription
       ? setDescriptionIsValid(true)
       : setDescriptionIsValid(false);
-    capturedFileBuffer ? setFileIsValid(true) : setFileIsValid(false);
 
-    const formIsValid = enteredName && enteredDescription && capturedFileBuffer;
+    const formIsValid = enteredName && enteredDescription;
 
     // Upload file to IPFS and push to the blockchain
     const mintNFT = async () => {
       // Add file to the IPFS
-      const fileAdded = await ipfs.add(capturedFileBuffer);
-      if (!fileAdded) {
-        console.error("Something went wrong when updloading the file");
-        return;
-      }
-
-      const metadata = {
-        title: "Asset Metadata",
-        type: "object",
-        properties: {
-          name: {
-            type: "string",
-            description: enteredName,
-          },
-          description: {
-            type: "string",
-            description: enteredDescription,
-          },
-          image: {
-            type: "string",
-            description: fileAdded.path,
-          },
-        },
-      };
-
-      const metadataAdded = await ipfs.add(JSON.stringify(metadata));
-      if (!metadataAdded) {
-        console.error("Something went wrong when updloading the file");
-        return;
-      }
 
       collectionCtx.contract.methods
-        .safeMint(metadataAdded.path)
+        .mint(web3Ctx.account, enteredName, enteredDescription)
         .send({ from: web3Ctx.account })
         .on("transactionHash", (hash) => {
           collectionCtx.setNftIsLoading(true);
@@ -133,10 +87,12 @@ const MintForm = () => {
     <form onSubmit={submissionHandler}>
       <div className="row justify-content-center">
         <Form.Group className="mb-4" controlId="formBasicEmail">
-          <Form.Label style={{ color: "white", fontSize: 20 }}>Name</Form.Label>
+          <Form.Label style={{ color: "white", fontSize: 20 }}>
+            TokenURI
+          </Form.Label>
           <Form.Control
             type="text"
-            placeholder="Enter name of NFT"
+            placeholder="Enter tokenUri of NFT"
             value={enteredName}
             onChange={enteredNameHandler}
             size="lg"
@@ -144,58 +100,15 @@ const MintForm = () => {
         </Form.Group>
 
         <Form.Group className="mb-4" controlId="formBasicEmail">
-          <Form.Label style={{ color: "white", fontSize: 20 }}>
-            Description
-          </Form.Label>
+          <Form.Label style={{ color: "white", fontSize: 20 }}>UUID</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Enter Description of NFT"
+            placeholder="Enter uuid of NFT"
             value={enteredDescription}
             onChange={enteredDescriptionHandler}
             size="lg"
           />
         </Form.Group>
-
-        <ImageUploading
-          multiple
-          value={images}
-          onChange={onChange}
-          maxNumber={1}
-          dataURLKey="data_url"
-        >
-          {({
-            imageList,
-            onImageUpload,
-            onImageRemoveAll,
-            onImageUpdate,
-            onImageRemove,
-            isDragging,
-            dragProps,
-          }) => (
-            // write your building UI
-            <div className="upload__image-wrapper">
-              {images.length === 0 && (
-                <button
-                  style={isDragging ? { color: "red" } : undefined}
-                  onClick={onImageUpload}
-                  {...dragProps}
-                >
-                  <img style={{ width: 30, height: 30 }} src={ImageUpload} />
-                </button>
-              )}
-              &nbsp;
-              {imageList.map((image, index) => (
-                <div key={index} className="image-item">
-                  <img src={image["data_url"]} alt="" width="100" />
-                  <div className="image-item__btn-wrapper">
-                    <button onClick={() => onImageUpdate(index)}>Update</button>
-                    <button onClick={() => onImageRemove(index)}>Remove</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </ImageUploading>
 
         {/* <div className="col-md-2">
           <input
