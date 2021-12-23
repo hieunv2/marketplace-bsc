@@ -42,6 +42,8 @@ const App = () => {
       // Load account
       const account = await web3Ctx.loadAccount(web3);
 
+      web3Ctx.loadBalance();
+
       // Load Network ID
       const networkId = await web3Ctx.loadNetworkId(web3);
 
